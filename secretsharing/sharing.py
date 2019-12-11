@@ -102,6 +102,7 @@ class SecretSharer():
     """
     secret_charset = string.hexdigits[0:16]
     share_charset = string.hexdigits[0:16]
+    prefix = 'secret-'
 
     def __init__(self):
         pass
@@ -112,14 +113,14 @@ class SecretSharer():
         points = secret_int_to_points(secret_int, share_threshold, num_shares)
         shares = []
         for point in points:
-            shares.append(point_to_share_string(point, cls.share_charset))
+            shares.append(cls.prefix + point_to_share_string(point, cls.share_charset))
         return shares
 
     @classmethod
     def recover_secret(cls, shares):
         points = []
         for share in shares:
-            points.append(share_string_to_point(share, cls.share_charset))
+            points.append(share_string_to_point(share.lstrip(cls.prefix), cls.share_charset))
         secret_int = points_to_secret_int(points)
         secret_string = int_to_charset(secret_int, cls.secret_charset)
         return secret_string
